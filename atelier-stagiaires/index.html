@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Inscription des stagiaires</title>
+  <style>
+    body{font-family:system-ui,sans-serif;background:#f4f6fb;margin:0;padding:24px}
+    nav{max-width:420px;margin:0 auto 12px;text-align:right}
+    nav a{color:#3b5bdb;text-decoration:none}
+    form{max-width:420px;margin:auto;background:#fff;padding:24px;border-radius:12px;box-shadow:0 2px 10px rgba(0,0,0,.08)}
+    h1{margin-top:0;font-size:1.4rem}
+    label{display:block;margin:12px 0 4px;font-weight:600}
+    input{width:100%;padding:10px;border:1px solid #ccd;border-radius:8px;box-sizing:border-box}
+    button{margin-top:18px;width:100%;padding:12px;border:0;border-radius:8px;background:#3b5bdb;color:#fff;font-size:1rem;cursor:pointer}
+    button:disabled{opacity:.6}
+    #message{margin-top:14px;text-align:center}
+    .ok{color:#2b8a3e}.err{color:#c92a2a}
+  </style>
+</head>
+<body>
+  <nav><a href="liste.html">Voir la liste →</a></nav>
+  <form id="form">
+    <h1>Inscription d'un stagiaire</h1>
+    <label for="nom">Nom</label>
+    <input id="nom" name="nom" required>
+    <label for="prenom">Prénom</label>
+    <input id="prenom" name="prenom" required>
+    <label for="ville">Ville</label>
+    <input id="ville" name="ville" required>
+    <label for="photo">Photo</label>
+    <input id="photo" name="photo" type="file" accept="image/*" required>
+    <button type="submit" id="btn">Inscrire</button>
+    <div id="message"></div>
+  </form>
+
+  <script>
+    const form = document.getElementById('form');
+    const btn = document.getElementById('btn');
+    const message = document.getElementById('message');
+
+    form.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      btn.disabled = true;
+      message.textContent = 'Envoi en cours...';
+      message.className = '';
+
+      try {
+        const res = await fetch('/api/inscrire.php', {
+          method: 'POST',
+          body: new FormData(form)
+        });
+        const data = await res.json();
+        message.textContent = data.message;
+        message.className = data.success ? 'ok' : 'err';
+        if (data.success) form.reset();
+      } catch (err) {
+        message.textContent = 'Erreur réseau.';
+        message.className = 'err';
+      } finally {
+        btn.disabled = false;
+      }
+    });
+  </script>
+</body>
+</html>
